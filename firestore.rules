@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to create an order (required for landing page checkout)
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && (
+        request.auth.token.email == "ibotshopline@gmail.com" || 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+      );
+    }
+    
+    // CRM stats and metadata
+    match /settings/{docId} {
+      allow read, write: if request.auth != null && (
+        request.auth.token.email == "ibotshopline@gmail.com" || 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+      );
+    }
+
+    // Admins collection rule
+    match /admins/{email} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.token.email == email;
+    }
+  }
+}
