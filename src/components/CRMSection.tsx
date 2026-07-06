@@ -263,7 +263,11 @@ export default function CRMSection({ onBackToLanding }: CRMSectionProps) {
           createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
           referenceId: data.referenceId || "REF-ERR",
           itemQuantity: data.itemQuantity || 1,
-          totalPrice: data.totalPrice || 78000
+          totalPrice: data.totalPrice || 78000,
+          selectedStyles: data.selectedStyles || [],
+          packageName: data.packageName || "",
+          size: data.size || "",
+          clothingDetails: data.clothingDetails || ""
         };
         ordersList.push(ord);
 
@@ -431,15 +435,19 @@ export default function CRMSection({ onBackToLanding }: CRMSectionProps) {
       rawNum = "234" + rawNum;
     }
 
+    const packageDesc = order.packageName || "Premium Clothes Outfit";
+    const sizeDesc = order.size ? ` (Size: ${order.size})` : "";
+    const itemsDesc = order.clothingDetails ? ` - [${order.clothingDetails}]` : "";
+
     let msg = "";
     if (order.status === "Pending") {
-      msg = `Hello ${order.fullName},\n\nI am the Shipping Manager from the *7-Piece Watch Luxury Store*.\n\nWe received your order for *${order.itemQuantity} Box(es)* of the watch gift set (Total: ₦${order.totalPrice.toLocaleString()}) to be delivered to *${order.city}, ${order.state}*.\n\nKindly reply to this message to *CONFIRM* your address so we can dispatch your box immediately. Thank you!`;
+      msg = `Hello ${order.fullName},\n\nI am the Shipping Manager from *IBOTSHOPLINE Premium Apparel*.\n\nWe received your order for the *${packageDesc}${sizeDesc}${itemsDesc}* (Total: ₦${order.totalPrice.toLocaleString()}) to be delivered to *${order.city}, ${order.state}*.\n\nKindly reply to this message to *CONFIRM* your address so we can dispatch your apparel items immediately. Thank you!`;
     } else if (order.status === "Confirmed") {
-      msg = `Hello ${order.fullName},\n\nGreat news! Your order of the *7-Piece Watch Gift Set* is now *CONFIRMED*.\n\nOur packaging team is boxing your order with reference *${order.referenceId}*. We will send your tracking code once shipped.\n\nThank you for choosing us!`;
+      msg = `Hello ${order.fullName},\n\nGreat news! Your order for *${packageDesc}${sizeDesc}* is now *CONFIRMED*.\n\nOur packaging team is preparing your items with reference *${order.referenceId}*. We will send your tracking code once shipped.\n\nThank you for choosing us!`;
     } else if (order.status === "Shipped") {
-      msg = `Hello ${order.fullName},\n\nYour *7-Piece Watch Gift Set* has been dispatched and is currently in transit to your address in *${order.state}*.\n\nOur delivery agent will call you shortly on *${order.phoneNo}* to coordinate drop-off. Please keep your phone reachable. Thank you!`;
+      msg = `Hello ${order.fullName},\n\nYour *${packageDesc}${sizeDesc}* has been dispatched and is currently in transit to your address in *${order.state}*.\n\nOur delivery agent will call you shortly on *${order.phoneNo}* to coordinate drop-off. Please keep your phone reachable. Thank you!`;
     } else {
-      msg = `Hello ${order.fullName},\n\nThis is regarding your order *${order.referenceId}* for the *7-Piece Watch Gift Set*. We want to follow up on your delivery experience!`;
+      msg = `Hello ${order.fullName},\n\nThis is regarding your order *${order.referenceId}* for the *${packageDesc}*. We want to follow up on your delivery experience!`;
     }
 
     return `https://wa.me/${rawNum}?text=${encodeURIComponent(msg)}`;
@@ -471,7 +479,7 @@ export default function CRMSection({ onBackToLanding }: CRMSectionProps) {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `watch_orders_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `clothes_orders_export_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -490,7 +498,7 @@ export default function CRMSection({ onBackToLanding }: CRMSectionProps) {
             &larr; Back to Landing Page
           </button>
           <h1 className="font-display text-3xl font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
-            📊 Watch Sales & Order CRM
+            📊 Clothes Sales & Order CRM
           </h1>
           <p className="text-xs text-slate-500 font-sans mt-0.5">
             Fulfill orders, track delivery pipelines, and manage customer communications.
@@ -795,8 +803,19 @@ export default function CRMSection({ onBackToLanding }: CRMSectionProps) {
                             </span>
                           </div>
                           <div className="font-bold text-gray-950 text-base">{order.fullName}</div>
+                          {order.packageName && (
+                            <div className="text-xs text-amber-800 font-bold uppercase tracking-wider flex items-center gap-1">
+                              <span>📦 {order.packageName}</span>
+                              {order.size && <span className="bg-slate-200 text-slate-800 text-[10px] px-1.5 py-0.2 rounded font-sans uppercase font-extrabold">{order.size}</span>}
+                            </div>
+                          )}
+                          {order.clothingDetails && (
+                            <div className="text-[11px] text-gray-600 font-sans italic leading-relaxed">
+                              Styles: {order.clothingDetails}
+                            </div>
+                          )}
                           <div className="text-xs text-gray-500 flex items-center gap-1">
-                            <span>Quantity: {order.itemQuantity} Set Box{order.itemQuantity > 1 ? "es" : ""}</span>
+                            <span>Quantity: {order.itemQuantity} item{order.itemQuantity > 1 ? "s" : ""}</span>
                             <span>&bull;</span>
                             <span className="font-bold text-gray-800">Total: ₦{order.totalPrice.toLocaleString()}</span>
                           </div>

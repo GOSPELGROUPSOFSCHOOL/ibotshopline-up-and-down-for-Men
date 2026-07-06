@@ -24,15 +24,43 @@ interface LandingPageProps {
 export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPageProps) {
   // Image gallery state
   const [images, setImages] = useState<string[]>([
-    "https://i.ibb.co/hxpsJqm7/IMG-20260601-WA0022.jpg",
-    "https://i.ibb.co/zVRk3pgx/IMG-20260601-WA0017.jpg",
-    "https://i.ibb.co/WvBSPf1B/IMG-20260601-WA0012.jpg"
+    "https://i.ibb.co/sd3zkcDV/IMG-20260628-WA0083.jpg",
+    "https://i.ibb.co/3yH80rLV/IMG-20260704-WA0046.jpg",
+    "https://i.ibb.co/qFshF3RX/IMG-20260704-WA0045.jpg"
   ]);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
 
   // Countdown timer state (hours, minutes, seconds)
   const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 24, seconds: 45 });
+
+  // Clothing styles metadata
+  const CLOTHING_STYLES = [
+    {
+      id: "emerald",
+      name: "Emerald Crest Premium Two-Piece Tracksuit",
+      price: 48000,
+      regularPrice: 60000,
+      description: "Luxurious deep Emerald green native Two-Piece Tracksuit. Features premium gold hand-detailed embroidery on the chest and cuffs, projecting wealth and royal stature.",
+      features: ["Premium Fine Cotton-Wool Blend", "Exquisite Gold Chest Embroidery", "Rich Deep Emerald Green Tone", "Matching Tailored Track Pants"]
+    },
+    {
+      id: "navy",
+      name: "Black Sovereign Two-Piece Tracksuit",
+      price: 48000,
+      regularPrice: 60000,
+      description: "Distinguished Obsidian Black Premium Two-Piece Tracksuit. Features precision customized shoulder and front embroidery patterns, giving a powerful modern athletic look.",
+      features: ["Elite Durable Fabric Blend", "Sleek Custom Front Embroidery", "Prestige Deep Black Color", "Matching Tailored Track Pants Included"]
+    },
+    {
+      id: "ivory",
+      name: "Heritage Ivory Monarch Two-Piece Tracksuit",
+      price: 48000,
+      regularPrice: 60000,
+      description: "An absolute masterpiece of modern elegance in clean Ivory White/Cream Two-Piece Tracksuit. Crafted with premium breathable cotton-fleece for maximum daily comfort.",
+      features: ["Breathable High-Density Cotton-Linen", "Subtle Textured Contrast Piping", "Pristine Ivory White & Gold Accent", "Matching Ivory Pants Included"]
+    }
+  ];
 
   // Form states
   const [fullName, setFullName] = useState("");
@@ -45,9 +73,44 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const unitPrice = 78000; // Price in Naira
-  const regularPrice = 110000;
-  const totalPrice = unitPrice * quantity;
+  // Custom package selection states
+  const [selectedPackage, setSelectedPackage] = useState<"single" | "double" | "triple">("single");
+  const [selectedSingleStyle, setSelectedSingleStyle] = useState<string>("Emerald Crest Premium Two-Piece Tracksuit");
+  const [selectedDoubleStyles, setSelectedDoubleStyles] = useState<string[]>([
+    "Emerald Crest Premium Two-Piece Tracksuit", 
+    "Black Sovereign Two-Piece Tracksuit"
+  ]);
+  const [selectedSize, setSelectedSize] = useState<string>("L");
+
+  // Helper to calculate pricing dynamically
+  const getSelectedPackageInfo = () => {
+    if (selectedPackage === "single") {
+      const styleInfo = CLOTHING_STYLES.find(s => s.name === selectedSingleStyle);
+      return {
+        packageName: "Single Style - Standard Pack",
+        clothingDetails: selectedSingleStyle,
+        price: styleInfo ? styleInfo.price : 48000,
+        regularPrice: styleInfo ? styleInfo.regularPrice : 60000
+      };
+    } else if (selectedPackage === "double") {
+      return {
+        packageName: "Double Style - Luxury Combo",
+        clothingDetails: selectedDoubleStyles.join(" + "),
+        price: 90000,
+        regularPrice: 120000
+      };
+    } else {
+      return {
+        packageName: "Triple Style - Ultimate Wardrobe",
+        clothingDetails: "All 3 Clothes (Emerald + Black + Heritage Ivory Two-Piece Tracksuits)",
+        price: 132000,
+        regularPrice: 180000
+      };
+    }
+  };
+
+  const { packageName, clothingDetails, price: packageUnitPrice, regularPrice: packageRegularPrice } = getSelectedPackageInfo();
+  const totalPrice = packageUnitPrice * quantity;
 
   // Load images from backend album API
   useEffect(() => {
@@ -59,17 +122,17 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
           setImages(data.images);
         } else {
           setImages([
-            "https://i.ibb.co/hxpsJqm7/IMG-20260601-WA0022.jpg",
-            "https://i.ibb.co/zVRk3pgx/IMG-20260601-WA0017.jpg",
-            "https://i.ibb.co/WvBSPf1B/IMG-20260601-WA0012.jpg"
+            "https://i.ibb.co/sd3zkcDV/IMG-20260628-WA0083.jpg",
+            "https://i.ibb.co/3yH80rLV/IMG-20260704-WA0046.jpg",
+            "https://i.ibb.co/qFshF3RX/IMG-20260704-WA0045.jpg"
           ]);
         }
       } catch (e) {
         console.error("Error fetching images, loading templates:", e);
         setImages([
-          "https://i.ibb.co/hxpsJqm7/IMG-20260601-WA0022.jpg",
-          "https://i.ibb.co/zVRk3pgx/IMG-20260601-WA0017.jpg",
-          "https://i.ibb.co/WvBSPf1B/IMG-20260601-WA0012.jpg"
+          "https://i.ibb.co/sd3zkcDV/IMG-20260628-WA0083.jpg",
+          "https://i.ibb.co/3yH80rLV/IMG-20260704-WA0046.jpg",
+          "https://i.ibb.co/qFshF3RX/IMG-20260704-WA0045.jpg"
         ]);
       } finally {
         setIsLoadingImages(false);
@@ -101,7 +164,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
-
+ 
     // Simple validation
     if (!fullName.trim()) return setSubmitError("Please enter your full name.");
     if (!address.trim()) return setSubmitError("Please enter your detailed delivery address.");
@@ -109,14 +172,17 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
     if (!phoneNo.trim()) return setSubmitError("Please enter your active call phone number.");
     if (!deliveryState) return setSubmitError("Please select your delivery state.");
     if (!deliveryCity.trim()) return setSubmitError("Please enter your delivery city.");
-
+    if (selectedPackage === "double" && selectedDoubleStyles.length !== 2) {
+      return setSubmitError("Please check exactly 2 clothing styles for your Double Style package.");
+    }
+ 
     setIsSubmitting(true);
-
+ 
     try {
       // Generate a unique 8-character numeric/alpha order reference code
       const randHex = Math.floor(100000 + Math.random() * 900000).toString();
-      const referenceId = `WT-${randHex}`;
-
+      const referenceId = `AP-${randHex}`;
+ 
       const orderData = {
         fullName: fullName.trim(),
         address: address.trim(),
@@ -129,9 +195,13 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
         createdAt: serverTimestamp(),
         referenceId,
         itemQuantity: quantity,
-        totalPrice: totalPrice
+        totalPrice: totalPrice,
+        selectedStyles: selectedPackage === "single" ? [selectedSingleStyle] : selectedPackage === "double" ? selectedDoubleStyles : CLOTHING_STYLES.map(s => s.name),
+        packageName,
+        size: selectedSize,
+        clothingDetails
       };
-
+ 
       // Store in Firestore collection "orders"
       const docRef = await addDoc(collection(db, "orders"), orderData);
       
@@ -141,7 +211,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
         ...orderData,
         createdAt: new Date() // local representation
       });
-
+ 
     } catch (err: any) {
       console.error("Order submit failed:", err);
       setSubmitError("Failed to register your order. Please check your internet connection and try again.");
@@ -168,59 +238,59 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
     setActiveImageIdx(prev => (prev - 1 + images.length) % images.length);
   };
 
-  // Curated product features
+  // Curated product features for clothes
   const features = [
     {
-      title: "Elegant Luxury Design",
-      desc: "Turn heads wherever you go with a sophisticated timepiece that adds a touch of class to both casual and formal outfits.",
+      title: "Elegant Custom Chest Embroidery",
+      desc: "Turn heads with sophisticated, precision-stitched embroidery patterns on the chest and cuffs, adding custom flair to your casual luxury presence.",
       iconName: "Sparkles",
       colorClass: "bg-amber-500/10 border-amber-500/20 text-amber-500"
     },
     {
-      title: "Precision Quartz Movement",
-      desc: "Enjoy accurate and dependable timekeeping powered by a high-quality quartz movement that keeps you on schedule every day.",
+      title: "Premium Double-Knit Cotton Blend",
+      desc: "Experience luxurious thickness, structure, and 4-way stretch comfort. Carefully selected fibers ensure the tracksuit retains its sharp, tailored look.",
       iconName: "Clock",
       colorClass: "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
     },
     {
-      title: "Premium Durable Construction",
-      desc: "Built with quality materials to withstand daily wear while maintaining its stylish appearance for years to come.",
+      title: "Tailored Athletic Fit",
+      desc: "Precision tailored to drape perfectly over your chest and shoulders, with modern tapered sleeves and pants that project an executive yet athletic look.",
       iconName: "ShieldCheck",
       colorClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
     },
     {
-      title: "Comfortable Adjustable Strap",
-      desc: "Designed with an ergonomic, adjustable strap that provides a secure and comfortable fit for all-day wear.",
+      title: "All-Weather Breathability",
+      desc: "High-density breathable knitting keeps you insulated in cool weather yet breezy and dry in the warm afternoons, making it the ultimate everyday outfit.",
       iconName: "Smile",
       colorClass: "bg-rose-500/10 border-rose-500/20 text-rose-400"
     },
     {
-      title: "Scratch-Resistant Glass",
-      desc: "The durable watch crystal helps protect the dial from scratches, keeping your watch looking new for longer.",
+      title: "Anti-Wrinkle Fabric Tech",
+      desc: "Engineered to resist standard creasing and wrinkles, allowing you to stay sharp during long travels, outdoor commutes, or weekend lounges.",
       iconName: "Layers",
       colorClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
     },
     {
-      title: "Lightweight & Comfortable",
-      desc: "Engineered to be lightweight, allowing you to wear it throughout the day without discomfort or wrist fatigue.",
+      title: "Vibrant Anti-Fade Tones",
+      desc: "Deep solid colors (Emerald Green, Obsidian Black, Heritage Ivory) that retain their high luster and deep dye even after multiple washes.",
       iconName: "Compass",
       colorClass: "bg-violet-500/10 border-violet-500/20 text-violet-400"
     },
     {
-      title: "Easy-to-Read Display",
-      desc: "Features a clear, well-designed dial with bold markers, making it effortless to check the time at a glance.",
+      title: "Matching Tailored Pants",
+      desc: "Every tracksuit top is accompanied by its matching, custom-fitted drawstring pants featuring zippered side pockets and secure comfortable waistbands.",
       iconName: "Eye",
       colorClass: "bg-teal-500/10 border-teal-500/20 text-teal-400"
     },
     {
-      title: "Perfect for Every Occasion",
-      desc: "Whether you're attending a business meeting, party, wedding, or simply going out, this watch complements every style and occasion.",
+      title: "Versatile Modern Athleisure",
+      desc: "Whether going for quick business lounges, airport travels, high-profile physical retreats, or weekend gatherings, remain stylishly comfortable.",
       iconName: "Award",
       colorClass: "bg-amber-500/15 border-amber-500/30 text-yellow-500"
     },
     {
-      title: "Exceptional Value for Money",
-      desc: "Get the premium appearance and reliable performance of a luxury watch without paying a premium price—making it an excellent choice for yourself or as a thoughtful gift.",
+      title: "Unmatched Wardrobe Value",
+      desc: "Order 2 styles or the full 3 styles bundle and receive massive discounts that you won't get anywhere else.",
       iconName: "Coins",
       colorClass: "bg-yellow-500/10 border-yellow-500/20 text-yellow-500"
     }
@@ -248,7 +318,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
       {/* Dynamic Urgency Promo Header */}
       <div className="bg-red-700 text-white text-center py-2 px-4 font-bold text-xs md:text-sm flex items-center justify-center gap-2.5 sticky top-0 z-50 shadow-md uppercase tracking-wider">
         <Flame size={15} className="text-yellow-400 shrink-0" />
-        <span>PROMO ENDS SOON - GET 30% OFF TODAY! TIME LEFT:</span>
+        <span>PROMO ENDS SOON - SAVE UP TO 25% ON APPAREL BUNDLES! TIME LEFT:</span>
         <div className="bg-slate-900 text-white px-2 py-0.5 rounded font-mono text-xs font-bold shrink-0">
           {String(timeLeft.hours).padStart(2, "0")}h : {String(timeLeft.minutes).padStart(2, "0")}m : {String(timeLeft.seconds).padStart(2, "0")}s
         </div>
@@ -281,13 +351,13 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
         {/* Main Title Badge */}
         <div className="text-center mb-8">
           <span className="text-red-600 font-bold text-xs md:text-sm tracking-widest mb-3 italic block uppercase">
-            #1 BEST SELLER BY IBOTSHOPLINE IN NIGERIA • ULTIMATE MEN'S CORPORATE & NATIVE GIFT COLLECTION
+            #1 PRESTIGE MENSWEAR BY IBOTSHOPLINE IN NIGERIA • EXQUISITE TWO-PIECE TRACKSUIT BUNDLES
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight md:leading-tight uppercase">
-            Step Out Like A King! Get The New <span className="text-red-600 underline decoration-red-600/35 decoration-wavy">7-Piece Luxury Men's Gift Watches Set</span>
+            Command Respect & Royalty! Get The Exclusive <span className="text-red-600 underline decoration-red-600/35 decoration-wavy">Premium Hand-Embroidered Two-Piece Tracksuits</span>
           </h1>
           <p className="text-slate-600 mt-4 text-base md:text-lg max-w-2xl mx-auto font-sans leading-relaxed">
-            Upgrade your style or give the ultimate gift of honor. Majestic Box includes a premium Watch, Adjustable Belt, Sleek Wallet, Aviator Sunglasses, Elegant Bracelet, Steel Ring, & Miniature Pocket Perfume.
+            Modern, effortless two-piece sets designed for everyday style and comfort. Our premium collection features the Emerald Crest Premium Two-Piece Tracksuit, the Black Sovereign Two-Piece Tracksuit, and the Heritage Ivory Monarch Two-Piece Tracksuit. Choose your favorite or own the complete luxury wardrobe with a massive discount today!
           </p>
         </div>
 
@@ -297,17 +367,17 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
           {/* Gallery Column */}
           <div className="lg:col-span-7 bg-white rounded-xl p-4 md:p-6 shadow-md border border-slate-200">
             {isLoadingImages ? (
-              <div className="aspect-[4/3] bg-slate-100 animate-pulse rounded-lg flex items-center justify-center">
-                <span className="text-slate-400 font-medium">Loading high definition photos...</span>
+              <div className="aspect-[3/4] bg-slate-100 animate-pulse rounded-lg flex items-center justify-center">
+                <span className="text-slate-400 font-medium">Loading high definition catalog...</span>
               </div>
             ) : (
               <div>
                 {/* Active Image Box */}
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-slate-950 flex items-center justify-center border border-slate-200 shadow-sm">
+                <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-slate-950 flex items-center justify-center border border-slate-200 shadow-sm">
                   <img
                     src={images[activeImageIdx]}
-                    alt={`Watch Gift Box Image ${activeImageIdx + 1}`}
-                    className="w-full h-full object-cover"
+                    alt={`Traditional Style Image ${activeImageIdx + 1}`}
+                    className="w-full h-full object-contain"
                     referrerPolicy="no-referrer"
                   />
                   
@@ -331,7 +401,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
 
                   {/* Discount Badge */}
                   <div className="absolute top-4 left-4 bg-red-600 text-white font-bold text-xs px-3.5 py-1.5 rounded shadow-sm uppercase tracking-wider">
-                    30% OFF TODAY
+                    SAVE UP TO 25% TODAY
                   </div>
                 </div>
 
@@ -341,12 +411,28 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
                     {images.map((img, idx) => (
                       <button
                         key={idx}
-                        onClick={() => setActiveImageIdx(idx)}
+                        onClick={() => {
+                          setActiveImageIdx(idx);
+                          // Auto-sync form selection based on active thumbnail
+                          if (idx === 0) {
+                            setSelectedPackage("single");
+                            setSelectedSingleStyle("Emerald Crest Premium Two-Piece Tracksuit");
+                          } else if (idx === 1) {
+                            setSelectedPackage("single");
+                            setSelectedSingleStyle("Black Sovereign Two-Piece Tracksuit");
+                          } else if (idx === 2) {
+                            setSelectedPackage("single");
+                            setSelectedSingleStyle("Heritage Ivory Monarch Two-Piece Tracksuit");
+                          }
+                        }}
                         className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
                           idx === activeImageIdx ? "border-slate-900 scale-105 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
                         }`}
                       >
                         <img src={img} alt="Thumbnail" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        <div className="bg-slate-900 text-white text-[8px] font-bold text-center py-0.5 truncate">
+                          {idx === 0 ? "Emerald Green" : idx === 1 ? "Black" : "Heritage Ivory"}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -368,8 +454,8 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
               </div>
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                 <Award className="text-slate-800 mx-auto mb-1" size={18} />
-                <span className="block text-[11px] md:text-xs font-bold text-slate-900 uppercase">100% PREMIUM</span>
-                <span className="block text-[9px] text-slate-500 uppercase tracking-tight">QUALITY FIT</span>
+                <span className="block text-[11px] md:text-xs font-bold text-slate-900 uppercase">CUSTOM TAILORED</span>
+                <span className="block text-[9px] text-slate-500 uppercase tracking-tight">PREMIUM FIT</span>
               </div>
             </div>
           </div>
@@ -380,47 +466,82 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
             
             <div className="mb-5">
               <span className="bg-red-900/45 text-red-400 font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded border border-red-700/30">
-                🔥 FLASH PROMO DEAL
+                🔥 SPECIAL PROMO PACKAGE DEAL
               </span>
             </div>
 
             <h3 className="font-display text-2xl font-bold mb-4 text-yellow-500 uppercase tracking-tight">
-              Men's New 7-Piece Premium Gift Watches Collection
+              Traditional Male Apparel Collection
             </h3>
 
+            {/* Selection Quick Tabs */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              <button 
+                onClick={() => { setSelectedPackage("single"); setActiveImageIdx(0); }}
+                className={`py-2 px-1 rounded text-center border text-[10px] font-bold uppercase transition ${
+                  selectedPackage === "single" ? "bg-yellow-500 border-yellow-600 text-slate-950" : "bg-slate-950 border-slate-850 text-slate-300 hover:bg-slate-800"
+                }`}
+              >
+                1 Outfit Pack
+              </button>
+              <button 
+                onClick={() => { setSelectedPackage("double"); setActiveImageIdx(1); }}
+                className={`py-2 px-1 rounded text-center border text-[10px] font-bold uppercase transition ${
+                  selectedPackage === "double" ? "bg-yellow-500 border-yellow-600 text-slate-950" : "bg-slate-950 border-slate-850 text-slate-300 hover:bg-slate-800"
+                }`}
+              >
+                2 Outfits Combo
+              </button>
+              <button 
+                onClick={() => { setSelectedPackage("triple"); setActiveImageIdx(2); }}
+                className={`py-2 px-1 rounded text-center border text-[10px] font-bold uppercase transition ${
+                  selectedPackage === "triple" ? "bg-yellow-500 border-yellow-600 text-slate-950" : "bg-slate-950 border-slate-850 text-slate-300 hover:bg-slate-800"
+                }`}
+              >
+                All 3 Clothes
+              </button>
+            </div>
+
             {/* Pricing Panel */}
-            <div className="bg-slate-950 border border-slate-800 rounded-lg p-5 mb-6 flex items-center justify-between">
+            <div className="bg-slate-950 border border-slate-800 rounded-lg p-5 mb-5 flex items-center justify-between">
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase tracking-widest">Regular Price</span>
-                <span className="text-lg text-slate-400 line-through font-semibold">₦110,000</span>
+                <span className="text-base text-slate-400 line-through font-semibold">₦{packageRegularPrice.toLocaleString()}</span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] text-yellow-500 block uppercase tracking-widest font-black">Promo Price Today</span>
-                <span className="text-3xl md:text-4xl font-extrabold text-white font-display">₦78,000</span>
+                <span className="text-2xl md:text-3xl font-extrabold text-white font-display">₦{packageUnitPrice.toLocaleString()}</span>
               </div>
             </div>
 
-            <p className="text-sm text-slate-300 leading-relaxed mb-6 font-sans">
-              Skip the expensive individual purchases. Buying these items separately in Lagos or Abuja malls costs over ₦110,000. Get our curated high-demand 7-Piece Majestic Box today for just <span className="font-bold text-white">₦78,000</span>! 
+            {/* Package details description dynamic text */}
+            <div className="bg-slate-950/40 p-4 rounded-lg border border-slate-800/80 mb-5 text-xs text-slate-300 font-sans space-y-1.5">
+              <div className="text-white font-bold uppercase tracking-wider text-yellow-500 text-[10px]">Active Package:</div>
+              <div className="font-extrabold text-white text-sm">{packageName}</div>
+              <p className="leading-relaxed">{clothingDetails}</p>
+            </div>
+
+            <p className="text-xs text-slate-400 leading-relaxed mb-6 font-sans">
+              Why pay expensive boutique fees and waste weeks waiting? Buy our premium ready-to-wear luxury tracksuit set, crafted with supreme double-knit cotton-fleece and fine stitching. Tailored beautifully to represent your active yet noble status.
             </p>
 
-            <ul className="space-y-3 mb-8 text-sm text-slate-200">
-              <li className="flex items-center gap-2.5"><Check size={15} className="text-emerald-500 shrink-0" /> Free Shipping to any Nigerian State</li>
-              <li className="flex items-center gap-2.5"><Check size={15} className="text-emerald-500 shrink-0" /> No Advance Deposit - Pay cash/transfer on delivery</li>
-              <li className="flex items-center gap-2.5"><Check size={15} className="text-emerald-500 shrink-0" /> Hardcover Premium Black Gift Box Included</li>
-              <li className="flex items-center gap-2.5"><Check size={15} className="text-emerald-500 shrink-0" /> 100% Genuine Materials</li>
+            <ul className="space-y-2.5 mb-6 text-xs text-slate-200">
+              <li className="flex items-center gap-2.5"><Check size={14} className="text-emerald-500 shrink-0" /> Free Shipping to all 36 States + FCT Abuja</li>
+              <li className="flex items-center gap-2.5"><Check size={14} className="text-emerald-500 shrink-0" /> Cash or Transfer on Delivery (No deposit required)</li>
+              <li className="flex items-center gap-2.5"><Check size={14} className="text-emerald-500 shrink-0" /> Matching tailored trousers included for all garments</li>
+              <li className="flex items-center gap-2.5"><Check size={14} className="text-emerald-500 shrink-0" /> Luxury apparel hangers & dust covers included</li>
             </ul>
 
             {/* Pulsing Order CTA */}
             <button
               onClick={scrollToForm}
-              className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-black text-base py-4 px-6 rounded shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 uppercase tracking-widest flex items-center justify-center gap-2 mt-4 cursor-pointer"
+              className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-black text-sm py-3.5 px-6 rounded shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer animate-pulse"
             >
-              <ShoppingCart size={18} />
-              Claim My Promo Set Now
+              <ShoppingCart size={16} />
+              Customize & Order My Package
             </button>
-            <span className="block text-center text-[11px] text-slate-400 mt-3 italic">
-              ⚡ Only 14 Boxes Left for this Batch Delivery state!
+            <span className="block text-center text-[10px] text-slate-400 mt-2.5 italic">
+              ⚡ Only 12 Custom Bundles Left for this Week's Dispatch!
             </span>
           </div>
 
@@ -430,10 +551,10 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
         <div className="mb-16 bg-white rounded-xl p-6 md:p-10 shadow-lg border border-slate-200">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight">
-              Premium Features of the Majestic Watch Set 👑
+              Premium Styling & Fabric Specs 👑
             </h2>
             <p className="text-slate-500 mt-2 text-sm md:text-base font-sans">
-              Every single parameter is masterfully engineered to elevate your status, presence, and personal brand.
+              Each tracksuit is designed to reflect active elegance, executive posture, and extreme everyday comfort.
             </p>
           </div>
 
@@ -464,202 +585,6 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
               </div>
             ))}
             
-            {/* The Box */}
-            <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white p-6 rounded-2xl border border-yellow-500/30 flex flex-col justify-between lg:col-span-2 md:col-span-2 col-span-1 shadow-lg relative overflow-hidden group hover:border-yellow-500/60 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-2xl pointer-events-none"></div>
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl animate-pulse">🎁</span>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 uppercase tracking-wider">
-                    Exclusive Premium Bonus
-                  </span>
-                </div>
-                <h4 className="font-display font-bold text-yellow-400 text-lg md:text-xl mb-2 group-hover:text-yellow-300 transition">
-                  🎁 Heavyweight Gift Added
-                </h4>
-                <p className="text-sm text-slate-300 leading-relaxed font-sans">
-                  A premium 3-in-1 accessories bundle is added to your package, which includes an elegant matching bracelet, a classic polished steel ring, and a sleek premium necklace. All packaged with style.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                <span className="text-xs font-bold text-yellow-500 uppercase tracking-widest">
-                  Value: ₦9,000 (Included FREE)
-                </span>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
-                  Limited Batch Only
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Official Product Technical Specifications */}
-          <div className="mt-16 pt-12 border-t border-slate-200">
-            <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white rounded-3xl p-6 md:p-10 border border-yellow-500/30 shadow-2xl relative overflow-hidden">
-              {/* Luxury gold shine background elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl pointer-events-none"></div>
-              <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
-              {/* Header */}
-              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-slate-800">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-xs font-bold uppercase tracking-widest text-yellow-500 mb-3">
-                    👑 Premium Specifications
-                  </div>
-                  <h3 className="font-display font-black text-white uppercase text-xl md:text-3xl tracking-tight">
-                    Official Product Specifications
-                  </h3>
-                  <p className="text-slate-400 text-sm mt-1">
-                    Authentic Model S00771 Leisure Collection - precision certified
-                  </p>
-                </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-slate-800 text-[11px] font-bold tracking-wider rounded uppercase text-slate-300 border border-slate-700">
-                    Model: S00771
-                  </span>
-                  <span className="px-3 py-1 bg-amber-950/40 text-[11px] font-bold tracking-wider rounded uppercase text-yellow-400 border border-yellow-500/20">
-                    Movement: z618
-                  </span>
-                </div>
-              </div>
-
-              {/* Grid Content */}
-              <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                {/* Column 1: Watch Core */}
-                <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 hover:border-slate-700/80 transition duration-200">
-                  <div className="flex items-center gap-2.5 mb-4 pb-2.5 border-b border-slate-800">
-                    <span className="text-xl">⚙️</span>
-                    <h5 className="font-display font-bold uppercase tracking-wider text-xs text-yellow-500">
-                      Watch Core Mechanics
-                    </h5>
-                  </div>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Model / Item No:</span>
-                      <span className="font-mono font-bold text-yellow-400 text-[13px] bg-yellow-400/5 px-2 py-0.5 rounded border border-yellow-400/10">S00771</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Movement Brand:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">z618 Quartz</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Dial Diameter:</span>
-                      <span className="font-bold text-white text-[13px]">40mm</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Case Thickness:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">10mm</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Display Mode:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Pointer (Classic Analog)</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Dial Shape:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Round</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1">
-                      <span className="text-slate-400 text-xs">Crown Type:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Spiral Crown</span>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Column 2: Materials */}
-                <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 hover:border-slate-700/80 transition duration-200">
-                  <div className="flex items-center gap-2.5 mb-4 pb-2.5 border-b border-slate-800">
-                    <span className="text-xl">✨</span>
-                    <h5 className="font-display font-bold uppercase tracking-wider text-xs text-yellow-500">
-                      Premium Master Materials
-                    </h5>
-                  </div>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Strap Material:</span>
-                      <span className="font-semibold text-white text-[13px] bg-slate-800 px-2 py-0.5 rounded">High-Grade Alloy</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Case Material:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Solid Alloy</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Mirror Glass:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Ordinary Glass Mirror</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Buckle Style:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Single Folding Buckle</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Buckle Material:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Polished Iron</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Table Bottom:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Ordinary Base</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1">
-                      <span className="text-slate-400 text-xs">Waterproof Class:</span>
-                      <span className="font-bold text-red-400 text-[12px] uppercase bg-red-950/40 px-2 py-0.5 rounded border border-red-900/35">No Waterproofing</span>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Column 3: Sourcing & Box Sets */}
-                <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 hover:border-slate-700/80 transition duration-200">
-                  <div className="flex items-center gap-2.5 mb-4 pb-2.5 border-b border-slate-800">
-                    <span className="text-xl">🌍</span>
-                    <h5 className="font-display font-bold uppercase tracking-wider text-xs text-yellow-500">
-                      Sourcing & Presentation
-                    </h5>
-                  </div>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Set Code:</span>
-                      <span className="font-mono text-slate-300 text-[11px] bg-slate-800/80 px-2 py-0.5 rounded">zhm7-s02420-1</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Design Aesthetic:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">Royal Leisure Style</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Target Audience:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">General / Gentlemen</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Release Season:</span>
-                      <span className="font-medium text-amber-300 text-[13px] font-bold">Summer 2024 Collection</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Patented Sourcing:</span>
-                      <span className="font-medium text-slate-400 text-[13px]">No</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1 border-b border-slate-800/40">
-                      <span className="text-slate-400 text-xs">Direct Import:</span>
-                      <span className="font-medium text-slate-400 text-[13px]">No</span>
-                    </li>
-                    <li className="flex justify-between items-center py-1">
-                      <span className="text-slate-400 text-xs">Packaging Mode:</span>
-                      <span className="font-medium text-slate-100 text-[13px]">OPP Protective Standard</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Warranty and Authenticity Guarantee Box */}
-              <div className="relative z-10 mt-8 p-4 bg-gradient-to-r from-yellow-500/10 via-amber-500/10 to-yellow-500/10 rounded-xl border border-yellow-500/20 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🛡️</span>
-                  <div>
-                    <h6 className="font-bold text-yellow-400 text-sm">Official Store Warranty Included</h6>
-                    <p className="text-xs text-slate-300">Enjoy premium protection and guaranteed replacement support for any functional factory errors.</p>
-                  </div>
-                </div>
-                <div className="text-xs font-bold text-yellow-500 uppercase tracking-widest px-4 py-2 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
-                  Guaranteed Authentic Set
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -667,10 +592,10 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
         <div className="mb-16">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight">
-              Verified Customer Reviews ⭐⭐⭐⭐⭐
+              Verified Gentleman Reviews ⭐⭐⭐⭐⭐
             </h2>
             <p className="text-slate-500 mt-2 text-sm font-sans">
-              Read how men and gift-buying ladies across Nigeria feel about this set.
+              Read how men and gift-buying ladies across Nigeria feel about our clothes.
             </p>
           </div>
 
@@ -680,12 +605,12 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
                 {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="currentColor" />)}
               </div>
               <p className="text-slate-700 text-sm italic mb-4 leading-relaxed font-sans">
-                "This set is absolute madness! The quality is top notch. I wore the watch and sunglasses to a wedding in Lagos and everyone was asking where I got them. God bless you guys!"
+                "The Emerald Two-Piece Tracksuit is absolutely majestic! The gold chest embroidery has a solid premium weight to it, not cheap thread. I wore it to an premium launch in Lekki and received over 20 compliments. God bless IBOTSHOPLINE!"
               </p>
               <div className="flex items-center gap-2.5">
                 <div className="bg-slate-100 text-slate-800 font-bold text-xs w-8 h-8 rounded-full flex items-center justify-center border border-slate-200">CO</div>
                 <div>
-                  <h5 className="text-xs font-bold text-slate-900">Chinedu O.</h5>
+                  <h5 className="text-xs font-bold text-slate-900">Chief Chinedu O.</h5>
                   <p className="text-[10px] text-slate-400">Ikeja, Lagos (Verified Buyer)</p>
                 </div>
               </div>
@@ -696,7 +621,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
                 {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="currentColor" />)}
               </div>
               <p className="text-slate-700 text-sm italic mb-4 leading-relaxed font-sans">
-                "Delivered within 2 days to my office in Garki, Abuja. I inspected the package first before transferring the cash to the courier. Very honest and smooth transaction."
+                "I ordered the Black Sovereign Two-Piece Tracksuit in Large size and it was delivered to Garki within 48 hours. I opened it and tried it on before paying the courier. The fit is perfect, like it was custom sewn on my body. Highly recommended."
               </p>
               <div className="flex items-center gap-2.5">
                 <div className="bg-slate-100 text-slate-800 font-bold text-xs w-8 h-8 rounded-full flex items-center justify-center border border-slate-200">AM</div>
@@ -712,13 +637,13 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
                 {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="currentColor" />)}
               </div>
               <p className="text-slate-700 text-sm italic mb-4 leading-relaxed font-sans">
-                "Bought this as a surprise birthday gift for my fiancé. He couldn't stop taking pictures with it. The wallet looks very rich and the belt is so smart. Highly recommended."
+                "I bought the 3-Style wardrobe pack for my husband's birthday. It arrived in individual premium dust protection bags. He looks so handsome in the Heritage Ivory Two-Piece Tracksuit. Best online purchase this year!"
               </p>
               <div className="flex items-center gap-2.5">
                 <div className="bg-slate-100 text-slate-800 font-bold text-xs w-8 h-8 rounded-full flex items-center justify-center border border-slate-200">FO</div>
                 <div>
-                  <h5 className="text-xs font-bold text-slate-900">Funmi O.</h5>
-                  <p className="text-[10px] text-slate-400">Kano (Verified Buyer)</p>
+                  <h5 className="text-xs font-bold text-slate-900">Mrs. Funmi O.</h5>
+                  <p className="text-[10px] text-slate-400">Kano State (Verified Buyer)</p>
                 </div>
               </div>
             </div>
@@ -751,11 +676,188 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
               </div>
             )}
 
+            {/* Custom Clothing Configuration Grid */}
+            <div className="space-y-6">
+              
+              {/* Step 1: Package selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+                  Step 1: Choose Your Apparel Package <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Single Style */}
+                  <div 
+                    onClick={() => { setSelectedPackage("single"); setActiveImageIdx(0); }}
+                    className={`cursor-pointer p-4 rounded-xl border-2 transition ${
+                      selectedPackage === "single" ? "border-slate-900 bg-slate-50/50 shadow-md" : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-slate-900 text-sm">1 Style Pack</span>
+                      <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-black uppercase">Save 20%</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">Choose any 1 premium tracksuit style from our exclusive set.</p>
+                    <div className="mt-3 text-sm font-bold text-slate-900">₦{CLOTHING_STYLES.find(s => s.name === selectedSingleStyle)?.price.toLocaleString() || "48,000"} <span className="text-slate-400 line-through text-xs font-normal">₦{CLOTHING_STYLES.find(s => s.name === selectedSingleStyle)?.regularPrice.toLocaleString() || "60,000"}</span></div>
+                  </div>
+
+                  {/* Double Style Combo */}
+                  <div 
+                    onClick={() => { setSelectedPackage("double"); setActiveImageIdx(1); }}
+                    className={`cursor-pointer p-4 rounded-xl border-2 transition ${
+                      selectedPackage === "double" ? "border-slate-900 bg-slate-50/50 shadow-md" : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-slate-900 text-sm">2 Styles Combo</span>
+                      <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-black uppercase">Save 22%</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">Choose any 2 different tracksuit styles. Get matching pants for both styles.</p>
+                    <div className="mt-3 text-sm font-bold text-slate-900">₦90,000 <span className="text-slate-400 line-through text-xs font-normal">₦120,000</span></div>
+                  </div>
+
+                  {/* Triple Style Wardrobe */}
+                  <div 
+                    onClick={() => { setSelectedPackage("triple"); setActiveImageIdx(2); }}
+                    className={`cursor-pointer p-4 rounded-xl border-2 transition ${
+                      selectedPackage === "triple" ? "border-slate-900 bg-slate-50/50 shadow-md" : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-slate-900 text-sm">All 3 Clothes</span>
+                      <span className="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-black uppercase">Save 25%</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">Get the complete set (Emerald Green + Black + Heritage Ivory) with all track pants.</p>
+                    <div className="mt-3 text-sm font-bold text-slate-900">₦132,000 <span className="text-slate-400 line-through text-xs font-normal">₦180,000</span></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: Style Customization details */}
+              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">
+                  Step 2: Customize Your Selected Styles <span className="text-red-500">*</span>
+                </label>
+
+                {selectedPackage === "single" && (
+                  <div className="space-y-3">
+                    <p className="text-xs text-slate-500 mb-2 font-sans">Choose which 1 style you would like to order:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {CLOTHING_STYLES.map((style) => (
+                        <label 
+                          key={style.id}
+                          className={`flex flex-col p-3 rounded-lg border-2 cursor-pointer transition ${
+                            selectedSingleStyle === style.name ? "bg-white border-slate-900 shadow-sm" : "bg-white border-slate-200 hover:border-slate-300"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="radio"
+                              name="single-style-select"
+                              checked={selectedSingleStyle === style.name}
+                              onChange={() => {
+                                setSelectedSingleStyle(style.name);
+                                if (style.id === "emerald") setActiveImageIdx(0);
+                                if (style.id === "navy") setActiveImageIdx(1);
+                                if (style.id === "ivory") setActiveImageIdx(2);
+                              }}
+                              className="accent-slate-900 text-slate-900"
+                            />
+                            <span className="text-xs font-bold text-slate-900">{style.name}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 mt-1 leading-normal block">{style.description}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "double" && (
+                  <div>
+                    <p className="text-xs text-slate-500 mb-2 font-sans">Check exactly 2 clothing styles to include in your combo:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {CLOTHING_STYLES.map((style) => {
+                        const isChecked = selectedDoubleStyles.includes(style.name);
+                        return (
+                          <label 
+                            key={style.id}
+                            className={`flex flex-col p-3 rounded-lg border-2 cursor-pointer transition ${
+                              isChecked ? "bg-white border-slate-900 shadow-sm" : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  if (isChecked) {
+                                    // Remove if we have more than 1
+                                    if (selectedDoubleStyles.length > 1) {
+                                      setSelectedDoubleStyles(prev => prev.filter(s => s !== style.name));
+                                    }
+                                  } else {
+                                    // Add if current checked is less than 2
+                                    if (selectedDoubleStyles.length < 2) {
+                                      setSelectedDoubleStyles(prev => [...prev, style.name]);
+                                    } else {
+                                      // Replace first checked style to maintain exactly 2
+                                      setSelectedDoubleStyles(prev => [prev[1], style.name]);
+                                    }
+                                  }
+                                }}
+                                className="accent-slate-900 text-slate-900 rounded"
+                              />
+                              <span className="text-xs font-bold text-slate-900">{style.name}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-500 mt-1 leading-normal block">{style.description}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "triple" && (
+                  <div className="p-3 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 flex items-center gap-3">
+                    <span className="text-lg">👑</span>
+                    <div>
+                      <p className="font-bold text-slate-900">Your Triple Pack is Fully Configured!</p>
+                      <p className="text-[11px] text-slate-500">Includes 1x Emerald Crest Premium Two-Piece Tracksuit + 1x Black Sovereign Two-Piece Tracksuit + 1x Heritage Ivory Monarch Two-Piece Tracksuit (With matching tailored trousers for all 3).</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 3: Size selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+                  Step 3: Select Your Attire Size <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-4 gap-2.5 max-w-sm">
+                  {["M", "L", "XL", "XXL"].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setSelectedSize(size)}
+                      className={`py-3 text-sm font-bold rounded-lg border-2 uppercase tracking-wide transition ${
+                        selectedSize === size ? "bg-slate-950 border-slate-950 text-white shadow-md" : "bg-white border-slate-200 text-slate-800 hover:border-slate-300"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-400 mt-2 font-sans">
+                  *Standard fitting size. Don't worry, if the fit is incorrect upon delivery, we exchange it absolutely free of charge!
+                </p>
+              </div>
+
+            </div>
+
             {/* Quantity Selector */}
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-5 flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <label className="block text-sm font-bold text-slate-950 uppercase tracking-wider">Select Box Quantity:</label>
-                <p className="text-xs text-slate-500 mt-0.5 font-sans">Most customers buy 2 boxes to gift friends/family & save!</p>
+                <label className="block text-sm font-bold text-slate-950 uppercase tracking-wider">Select Package Quantity:</label>
+                <p className="text-xs text-slate-500 mt-0.5 font-sans">Most customers buy 2 sets to share with brothers or fathers.</p>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center bg-white border border-slate-300 rounded overflow-hidden">
@@ -925,17 +1027,27 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
                 <span>How much is delivery? Is it really free?</span>
               </h5>
               <p className="text-slate-600 text-sm mt-2 pl-7 font-sans leading-relaxed">
-                Yes! Delivery is 100% free nationwide. You do not pay any delivery fee or advance deposits to any courier.
+                Yes! Delivery is 100% free nationwide. You do not pay any delivery fee or advance deposits.
               </p>
             </div>
 
             <div className="bg-white p-5 rounded border border-slate-200 shadow-sm">
               <h5 className="font-bold text-slate-900 text-sm md:text-base flex items-start gap-2.5 font-display uppercase tracking-tight">
                 <HelpCircle size={18} className="text-yellow-600 shrink-0 mt-0.5" />
-                <span>Can I open and inspect the box before making payment?</span>
+                <span>What if the selected clothing size doesn't fit me?</span>
               </h5>
               <p className="text-slate-600 text-sm mt-2 pl-7 font-sans leading-relaxed">
-                Absolutely! Our courier will hand you the package so you can inspect the pristine quality of watches and also 3 in 1 accessories. Once fully satisfied, you can pay via cash or bank transfer on the spot.
+                We provide a 100% Fit Guarantee! If the clothing is too large or too tight, simply notify us on WhatsApp or call our support lines, and we will send our dispatch driver to swap it for a different size absolutely free.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded border border-slate-200 shadow-sm">
+              <h5 className="font-bold text-slate-900 text-sm md:text-base flex items-start gap-2.5 font-display uppercase tracking-tight">
+                <HelpCircle size={18} className="text-yellow-600 shrink-0 mt-0.5" />
+                <span>Can I open and inspect the clothes before payment?</span>
+              </h5>
+              <p className="text-slate-600 text-sm mt-2 pl-7 font-sans leading-relaxed">
+                Absolutely! Our courier will hand you the package so you can check the embroidery, premium double-knit fabrics, and pants fit. Once fully satisfied, you can pay via bank transfer or cash to the driver on the spot.
               </p>
             </div>
 
@@ -945,7 +1057,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
                 <span>How long does delivery take to my city?</span>
               </h5>
               <p className="text-slate-600 text-sm mt-2 pl-7 font-sans leading-relaxed">
-                - **Lagos / Abuja / Kano:** 1 to 2 business days.<br />
+                - **Lagos / Abuja / Port Harcourt:** 1 to 2 business days.<br />
                 - **Other State Capitals:** 2 to 3 business days.<br />
                 - **Remote Localities:** 3 to 4 business days.
               </p>
@@ -960,15 +1072,15 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
         <div className="max-w-6xl mx-auto px-4 text-center space-y-4">
           <p 
             onClick={onGoToAdmin}
-            className="font-display font-black text-white text-xl uppercase tracking-widest select-none inline-block cursor-default"
+            className="font-display font-black text-white text-xl uppercase tracking-widest select-none inline-block cursor-default cursor-pointer"
           >
             IBOTSHOPLINE
           </p>
           <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-            Luxury Men's 7-Piece Majestic Gift Watches Set
+            Premium Royal Two-Piece Tracksuit Collection
           </p>
           <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed font-sans">
-            Registered under Nigeria Corporate Affairs Commission. Trusted by over 5,400+ elegant gentlemen. 
+            Registered under Nigeria Corporate Affairs Commission. Trusted by over 12,400+ regal gentlemen nationwide.
           </p>
           <div className="flex justify-center gap-6 text-xs text-slate-500 pt-4 border-t border-slate-800 max-w-sm mx-auto font-sans">
             <span className="hover:text-white cursor-pointer transition">Terms of Service</span>
@@ -976,7 +1088,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
             <span className="hover:text-white cursor-pointer transition">Contact Support</span>
           </div>
           <p className="text-[10px] text-slate-600 font-mono">
-            &copy; 2026 IBOTSHOPLINE. All rights reserved. Made in alignment with premium lifestyle values.
+            &copy; 2026 IBOTSHOPLINE. All rights reserved. Made in alignment with premium royal values.
           </p>
         </div>
       </footer>

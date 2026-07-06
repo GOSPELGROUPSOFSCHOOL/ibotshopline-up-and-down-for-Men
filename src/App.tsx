@@ -26,8 +26,8 @@ export default function App() {
           fbq("track", "Purchase", {
             value: completedOrder.totalPrice,
             currency: "NGN",
-            content_name: "Men's 7-Piece Luxury Watch Gift Set",
-            content_ids: [completedOrder.referenceId || "watch-gift-set"],
+            content_name: "Premium Royal Two-Piece Tracksuit Set",
+            content_ids: [completedOrder.referenceId || "tracksuit-set"],
             content_type: "product",
             num_items: completedOrder.itemQuantity || 1
           });
@@ -59,7 +59,7 @@ export default function App() {
               MAJESTIC
             </div>
             <span className="font-display font-black text-slate-900 tracking-tight text-xl">
-              Watch Collection
+              Clothes Collection
             </span>
           </div>
 

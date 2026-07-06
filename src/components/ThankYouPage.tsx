@@ -38,8 +38,10 @@ export default function ThankYouPage({ order, onBackToShop }: ThankYouPageProps)
           </div>
           <div className="space-y-2 text-xs md:text-sm text-slate-700 font-sans">
             <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Reference ID</span> <span className="font-mono font-bold text-slate-900">{order.referenceId}</span></div>
-            <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Item</span> Men's New 7-Piece Luxury Watch Gift Set</div>
-            <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Quantity</span> {order.itemQuantity} Box{order.itemQuantity > 1 ? "es" : ""}</div>
+            <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Item Package</span> {order.packageName || "Premium Two-Piece Tracksuit Set"}</div>
+            <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Chosen Style(s)</span> <span className="text-slate-900 font-semibold">{order.clothingDetails || "Custom Selection"}</span></div>
+            <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Selected Size</span> <span className="font-mono font-bold bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded">{order.size || "L"}</span></div>
+            <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Quantity</span> {order.itemQuantity} Set{order.itemQuantity > 1 ? "s" : ""}</div>
             <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Delivery Cost</span> <span className="text-emerald-600 font-bold">FREE DELIVERY</span></div>
             <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Total Price</span> <span className="text-lg font-black text-slate-900">₦{order.totalPrice.toLocaleString()}</span></div>
             <div><span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Payment Method</span> <span className="font-bold text-slate-900">Pay On Delivery (POD)</span></div>
@@ -58,8 +60,8 @@ export default function ThankYouPage({ order, onBackToShop }: ThankYouPageProps)
           <div className="flex items-start gap-2">
             <div className="text-slate-900 mt-0.5"><Gift size={16} /></div>
             <div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Original Quality</h4>
-              <p className="text-[10px] text-slate-500 font-sans">100% Brand New Set</p>
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Premium Fabrics</h4>
+              <p className="text-[10px] text-slate-500 font-sans">Premium Cotton Blend</p>
             </div>
           </div>
           <div className="col-span-2 md:col-span-1 flex items-start gap-2 justify-center md:justify-start">

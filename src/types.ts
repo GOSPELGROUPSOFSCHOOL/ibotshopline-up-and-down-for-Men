@@ -14,6 +14,10 @@ export interface Order {
   referenceId: string;
   itemQuantity: number;
   totalPrice: number;
+  selectedStyles?: string[];
+  packageName?: string;
+  size?: string;
+  clothingDetails?: string;
 }
 
 export interface CRMStats {
