@@ -356,7 +356,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
           <h1 className="font-display text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight md:leading-tight uppercase">
             Command Respect & Royalty! Get The Exclusive <span className="text-red-600 underline decoration-red-600/35 decoration-wavy">Premium Hand-Embroidered Two-Piece Tracksuits</span>
           </h1>
-          <p className="text-slate-600 mt-4 text-base md:text-lg max-w-2xl mx-auto font-sans leading-relaxed">
+          <p className="text-slate-600 mt-4 text-base md:text-lg w-full font-sans leading-relaxed">
             Modern, effortless two-piece sets designed for everyday style and comfort. Our premium collection features the Emerald Crest Premium Two-Piece Tracksuit, the Black Sovereign Two-Piece Tracksuit, and the Heritage Ivory Monarch Two-Piece Tracksuit. Choose your favorite or own the complete luxury wardrobe with a massive discount today!
           </p>
         </div>
