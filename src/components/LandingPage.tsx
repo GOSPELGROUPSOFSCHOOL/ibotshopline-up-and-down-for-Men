@@ -471,7 +471,7 @@ export default function LandingPage({ onOrderSuccess, onGoToAdmin }: LandingPage
             </div>
 
             <h3 className="font-display text-2xl font-bold mb-4 text-yellow-500 uppercase tracking-tight">
-              Traditional Male Apparel Collection
+              Modern Tracksuit Collection
             </h3>
 
             {/* Selection Quick Tabs */}
